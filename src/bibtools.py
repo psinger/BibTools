@@ -12,7 +12,8 @@ def parseAux(f):
     check = set()
     for line in open(f):
         columns = line.strip().split("{")
-        if "bibcite" in columns[0]:
+        print columns
+        if "bibcite" in columns[0] or "citation" in columns[0]:
             check.add(columns[1][:-1])
 
     return check
@@ -88,7 +89,7 @@ def getElements(f, detailed=False):
                     ele += line
                     ele += "\n"
 
-
+    print dict
     return dict
 
 
@@ -195,10 +196,10 @@ def processJournal(s):
 
 def cleanElements(f, out):
 
-    f = open(f)
+    input = open(f)
     out = open(out, "w")
 
-    ele = getElements(f, detailed=True)
+    ele = getElements(input, detailed=True)
 
     # for k,v in ele.iteritems():
     #     if v["type"] == "@article":
@@ -210,11 +211,12 @@ def cleanElements(f, out):
         "AAAI Conference on Artificial Intelligence": "Conference on Artificial Intelligence",
         "Conference on Information and Knowledge Management": "International Conference on Information and Knowledge Management",
         "Cambridge Philosophical Society": "Mathematical Proceedings of the Cambridge Philosophical Society",
-        "In Workshop on Wordnet and Other Lexical Resources, Second Meeting of the North American Chapter of the Association for Computational Linguistics": "Workshop on WordNet and Other Lexical Resources",
+        "In Workshop on Wordnet and Other Lexical Resources, Second Meeting of the North AmeQFrican Chapter of the Association for Computational Linguistics": "Workshop on WordNet and Other Lexical Resources",
         "Workshop on Ontology Learning and Population (OLP)": "Workshop on Ontology Learning and Population",
         "Sixth International Conference on Knowledge Capture": "International Conference on Knowledge Capture",
         "Computers and Communications, . Proceedings., Second IEEE Symposium On": "Symposium on Computers and Communications",
         "ACM International Conference on Information and Knowledge Management":"International Conference on Information and Knowledge Management",
+        "ACM SIGKDD International Conference on Knowledge Discovery and Data Mining": "International Conference on Knowledge Discovery and Data Mining",
         "Twentieth International Joint Conference for Artificial Intelligence": "International Joint Conference for Artificial Intelligence",
         "Twenty-Fifth AAAI Conference on Artificial Intelligence": "Conference on Artificial Intelligence",
         "AAAI Conference on Artificial Intelligence": "Conference on Artificial Intelligence",
@@ -237,8 +239,20 @@ def cleanElements(f, out):
         "The Semantic Web: Semantics and Big Data":"European Semantic Web Conference",
         "International Conference on Conference on Information \& Knowledge Management" : "International Conference on Information and Knowledge Management",
         "In  Conference on Artificial Intelligence" : "Conference on Artificial Intelligence",
-        "Twenty-Eighth Australasian Conference on Computer Science - Volume" : "Australasian Conference on Computer Science"
-        #"Proceedings of" : ""
+        "Twenty-Eighth Australasian Conference on Computer Science - Volume" : "Australasian Conference on Computer Science",
+        "Data Mining (ICDM),  IEEE  International Conference On": "International Conference on Data Mining",
+        "Ninth ACM SIGKDD International Conference on Knowledge Discovery and Data Mining": "International Conference on Knowledge Discovery and Data Mining",
+        "European Conference on Machine Learning and Knowledge Discovery in Databases (ECML/PKDD)": "European Conference on Machine Learning and Knowledge Discovery in Databases",
+        "Fifth ACM SIGKDD International Conference on Knowledge Discovery and Data Mining":"International Conference on Knowledge Discovery and Data Mining",
+        "ACM SIGCOMM Conference on Internet Measurement Conference": "Internet Measurement Conference",
+        "ACM Conference on Hypertext and Social Media":"Conference on Hypertext and Social Media",
+        "Eighth International AAAI Conference on Weblogs and Social Media": "International Conference on Web and Social Media",
+        "ACM SIGCOMM Conference on Internet Measurement Conference": "Internet Measurement Conference",
+        "ACM Conference on Electronic Commerce": "Conference on Electronic Commerce",
+        "Privacy, Security, Risk and Trust (PASSAT),  International Conference on and  International Confernece on Social Computing (SocialCom)": "International Conference on Social Computing",
+        "Icwsm": "International Conference on Web and Social Media",
+        "Companion Publication of the  International Conference on World Wide Web Companion":"International Conference on World Wide Web Companion",
+
         }
     )
 
@@ -259,7 +273,10 @@ def cleanElements(f, out):
         "ACM Trans. Intell. Syst. Technol." : "ACM Transactions on Intelligent Systems and Technology",
         "Mem Cognit": "Memory \& Cognition",
         "Software Engineering, IEEE Transactions On": "IEEE Transactions on Software Engineering",
-        "Web Semantics: Science, Services and Agents on the World Wide Web":"Journal of Web Semantics"
+        "Web Semantics: Science, Services and Agents on the World Wide Web":"Journal of Web Semantics",
+        "SIGKDD Explor. Newsl." : "ACM SIGKDD Explorations Newsletter",
+        "PLoSOne":"PLOS ONE",
+        "Journal of Experimental Psychology. Applied": "Journal of Experimental Psychology: Applied"
         }
     )
 
@@ -339,7 +356,6 @@ def limitAux(f, aux, out):
 
         if k not in check:
             continue
-
         out.write(v["type"] + "{" + k + ",\n")
         for x,y in v.iteritems():
             if x == "type":
@@ -355,16 +371,20 @@ def backupFile(f):
 
 def main():
 
-    #replaceElements("/Users/psinger/Dropbox/Projects/Latex/phd_thesis/biblio_old.bib", "/Users/psinger/Dropbox/sharelatex/HypoMarkov/biblio.bib", "/Users/psinger/Dropbox/Projects/Latex/phd_thesis/biblio.bib")
 
-    #backupFile("/Users/psinger/Dropbox/Projects/Latex/phd_thesis/biblio.bib")
-    #limitAux("/Users/psinger/Dropbox/Projects/Latex/phd_thesis/biblio.bib.backup", "/Users/psinger/Dropbox/Projects/Latex/phd_thesis/.texpadtmp/thesis.aux", "/Users/psinger/Dropbox/Projects/Latex/phd_thesis/biblio.bib")
+    #always call backup first
+    backupFile("bib.bib")
 
-    backupFile("/Users/psinger/Dropbox/Projects/Latex/phd_thesis/biblio.bib")
-    cleanElements("/Users/psinger/Dropbox/Projects/Latex/phd_thesis/biblio.bib.backup", "/Users/psinger/Dropbox/Projects/Latex/phd_thesis/biblio.bib")
+    #removes all references in the bib file that are not in the aux file (i.e., not references in tex)
+    limitAux("bib.bib.backup", "bib.aux", "bib.bib")
+
+    #again backup
+    backupFile("bib.bib")
+
+    #this function cleans the elements
+    cleanElements("bib.bib.backup", "bib.bib")
 
 
-    #swapFileName("/Users/psinger/Dropbox/Projects/Latex/phd_thesis/biblio_new.bib", "/Users/psinger/Dropbox/Projects/Latex/phd_thesis/biblio.bib")
 
 if __name__ == "__main__":
     main()
